@@ -1,0 +1,132 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid()) @db.Char(36)
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Customer {
+  id         String   @id @default(uuid()) @db.Char(36)
+  name       String
+  email      String?  @unique
+  phone      String?
+  authUserId String?  @db.Char(36)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  addresses Address[]
+  orders    Order[]
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  customerId String? // <-- Make this optional (note the ?)
+  fullName   String
+  phone      String
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  customer Customer? @relation(fields: [customerId], references: [id])
+  orders   Order[]   @relation("AddressToOrder")
+}
+
+model Product {
+  id          String   @id @default(uuid()) @db.Char(36)
+  name        String
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  category    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  images     ProductImage[]
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+}
+
+model ProductImage {
+  id           String @id @default(uuid()) @db.Char(36)
+  productId    String @db.Char(36)
+  url          String
+  displayOrder Int    @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid()) @db.Char(36)
+  productId String  @db.Char(36)
+  size      String?
+  color     String?
+  price     Decimal @db.Decimal(10, 2)
+  stock     Int     @default(0)
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+}
+
+model Banner {
+  id           String   @id @default(uuid()) @db.Char(36)
+  title        String
+  subtitle     String?
+  imageUrl     String
+  linkUrl      String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Order {
+  id            String   @id @default(uuid()) @db.Char(36)
+  customerId    String?  @db.Char(36)
+  addressId     String?  @db.Char(36)
+  status        String   @default("PENDING")
+  total         Decimal  @db.Decimal(10, 2)
+  paymentStatus String   @default("PENDING")
+  paymentId     String?
+  guestName     String?
+  guestEmail    String?
+  guestPhone    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+
+  customer Customer?   @relation(fields: [customerId], references: [id])
+  address  Address?    @relation("AddressToOrder", fields: [addressId], references: [id])
+  items    OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(uuid()) @db.Char(36)
+  orderId   String  @db.Char(36)
+  productId String? @db.Char(36)
+  variantId String? @db.Char(36)
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id])
+  variant ProductVariant? @relation(fields: [variantId], references: [id])
+}
