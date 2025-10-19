@@ -83,7 +83,7 @@ export default function Checkout() {
         try {
 
           // Verify payment on backend
-          const verifyRes = await fetch('/api/payments/verify', {
+          const verifyRes = await fetch('/api/payment/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({...response, orderId}),

@@ -40,9 +40,9 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button className="p-2 hover:bg-gray-100 rounded-full">
+            {/* <button className="p-2 hover:bg-gray-100 rounded-full">
               <Search className="w-5 h-5 text-gray-600" />
-            </button>
+            </button> */}
 
             <Link href="/cart" className="p-2 hover:bg-gray-100 rounded-full relative">
               <ShoppingCart className="w-5 h-5 text-gray-600" />

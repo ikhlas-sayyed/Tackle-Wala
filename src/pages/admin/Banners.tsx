@@ -9,8 +9,8 @@ export default function Banners() {
   const [formData, setFormData] = useState({
     title: '',
     subtitle: '',
-    image_url: '',
-    link_url: '',
+    imageUrl: '',
+    linkUrl: '',
   });
 
   useEffect(() => {
@@ -22,26 +22,28 @@ export default function Banners() {
     if (res.success && res.data) setBanners(res.data);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const bannerData = {
-      title: formData.title,
-      subtitle: formData.subtitle || null,
-      imageUrl: formData.image_url,
-      linkUrl: formData.link_url || null,
-      isActive: true,
-      displayOrder: banners.length,
-    };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log('Submitting form, editingBanner =', editingBanner);
+  try {
     if (editingBanner) {
-      await apiClient.updateBanner(editingBanner.id, bannerData);
+      console.log('Calling updateBanner...');
+      const res = await apiClient.updateBanner(editingBanner.id, formData);
+      console.log('Update response:', res);
     } else {
-      await apiClient.createBanner(bannerData);
+      console.log('Calling createBanner...');
+      const res = await apiClient.createBanner(formData);
+      console.log('Create response:', res);
     }
-    setShowForm(false);
-    setEditingBanner(null);
-    setFormData({ title: '', subtitle: '', image_url: '', link_url: '' });
-    loadBanners();
-  };
+  } catch (err) {
+    console.error('Error in handleSubmit:', err);
+  }
+  setShowForm(false);
+  setEditingBanner(null);
+  setFormData({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
+  await loadBanners();
+};
+
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     await apiClient.updateBanner(id, { isActive: !currentStatus });
@@ -59,8 +61,8 @@ export default function Banners() {
     setFormData({
       title: banner.title,
       subtitle: banner.subtitle || '',
-      image_url: banner.imageUrl,
-      link_url: banner.linkUrl || '',
+      imageUrl: banner.imageUrl,
+      linkUrl: banner.linkUrl || '',
     });
     setShowForm(true);
   };
@@ -72,7 +74,7 @@ export default function Banners() {
         <button
           onClick={() => {
             setEditingBanner(null);
-            setFormData({ title: '', subtitle: '', image_url: '', link_url: '' });
+            setFormData({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
             setShowForm(true);
           }}
           className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -113,10 +115,10 @@ export default function Banners() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Image URL *</label>
               <input
-                type="url"
+                type="text"
                 required
-                value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                value={formData.imageUrl}
+                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -124,9 +126,9 @@ export default function Banners() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Link URL</label>
               <input
-                type="url"
-                value={formData.link_url}
-                onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                type="text"
+                value={formData.linkUrl}
+                onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -191,7 +193,7 @@ export default function Banners() {
                 </div>
               </div>
               {banner.linkUrl && (
-                <p className="text-xs text-gray-500 truncate">Link: {banner.link_url}</p>
+                <p className="text-xs text-gray-500 truncate">Link: {banner.linkUrl}</p>
               )}
             </div>
           </div>

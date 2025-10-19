@@ -50,12 +50,12 @@ export const productUpdateSchema = productCreateSchema.partial()
 
 // Banner schemas
 export const bannerCreateSchema = z.object({
-  title: z.string().min(1, 'Banner title is required'),
+  title: z.string().min(1),
   subtitle: z.string().optional(),
-  imageUrl: z.string().url('Invalid image URL'),
-  linkUrl: z.string().url('Invalid link URL').optional(),
-  displayOrder: z.number().int().default(0),
-  isActive: z.boolean().default(true),
+  imageUrl: z.string().min(1, 'Image URL is required'),
+  linkUrl: z.string().optional(),
+  displayOrder: z.number().int().default(0).optional(),
+  isActive: z.boolean().default(true).optional(),
 })
 
 export const bannerUpdateSchema = bannerCreateSchema.partial()

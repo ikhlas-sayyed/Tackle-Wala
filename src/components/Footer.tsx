@@ -24,9 +24,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Customer Service</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-              <li><Link href="/shipping" className="hover:text-white">Shipping Info</Link></li>
-              <li><Link href="/returns" className="hover:text-white">Returns</Link></li>
-            </ul>
+              </ul>
           </div>
 
           <div>
@@ -36,14 +34,6 @@ export function Footer() {
               <li><Link href="/policy/terms" className="hover:text-white">Terms & Conditions</Link></li>
               <li><Link href="/policy/cancellation" className="hover:text-white">Cancellation Policy</Link></li>
               <li><Link href="/policy/returns" className="hover:text-white">Returns Policy</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4">Account</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/profile" className="hover:text-white">My Account</Link></li>
-              <li><Link href="/orders" className="hover:text-white">Order History</Link></li>
             </ul>
           </div>
         </div>
