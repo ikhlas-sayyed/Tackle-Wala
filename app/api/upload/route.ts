@@ -1,15 +1,11 @@
 import { NextRequest } from 'next/server';
 import path from 'path';
 import fs from 'fs/promises';
-import { unauthorizedResponse } from '@/lib/response';
-import { AuthService } from '@/lib/auth';
+
 
 export async function POST(request: NextRequest) {
   try {
-    const user = AuthService.getUserFromRequest(request)
-    if (!user || user.role !== 'admin') {
-      return unauthorizedResponse()
-    } 
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
