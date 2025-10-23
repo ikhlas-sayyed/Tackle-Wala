@@ -2,6 +2,13 @@ import { NextRequest } from 'next/server';
 import path from 'path';
 import fs from 'fs/promises';
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '20mb', // adjust as needed
+    },
+  },
+};
 
 export async function POST(request: NextRequest) {
   try {
