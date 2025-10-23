@@ -6,7 +6,7 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6 py-16">
+    <section className="min-h-screen flex flex-col items-center justify-center bg-white px-6 py-16">
       <div className="max-w-2xl w-full bg-white shadow-lg rounded-2xl p-8 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
           Contact Us
@@ -20,17 +20,17 @@ export default function ContactPage() {
           <div>
             <h2 className="font-semibold text-xl text-gray-900"> Address</h2>
             <p className="text-gray-600 mt-2">
-              123 Marine Street, Mumbai, Maharashtra, India
+              Kondhwa, Pune, Maharashtra, India
             </p>
           </div>
 
           <div>
-            <h2 className="font-semibold text-xl text-gray-900"> Phone</h2>
-            <p className="text-gray-600 mt-2">+91 98765 43210</p>
+            <h2 className="font-semibold text-xl text-gray-900">Contact Phone</h2>
+            <p className="text-gray-600 mt-2">+91 83292 67622</p>
           </div>
 
           <div>
-            <h2 className="font-semibold text-xl text-gray-900"> Email</h2>
+            <h2 className="font-semibold text-xl text-gray-900">Contact Email</h2>
             <p className="text-gray-600 mt-2">support@tacklewala.com</p>
           </div>
         </div>

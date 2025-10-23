@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
 
     return successResponse(address, 'Address created successfully', 201);
   } catch (error) {
+    console.error('Error creating address:', error);
     return errorResponse(error as Error);
   }
 }

@@ -5,9 +5,14 @@ import { Providers } from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'E-Commerce Store',
-  description: 'Modern e-commerce store with Next.js and custom backend',
+export const metadata = {
+  title: "Tackle Wala - Premium Fishing Tackle & Equipment",
+  description: "Shop premium fishing tackle, rods, reels, lures, and accessories at Tackle Wala.",
+  keywords: ["Tackle Wala", "fishing tackle", "fishing equipment", "rods", "reels", "lures"],
+  authors: [{ name: "Tackle Wala" }],
+  icons: {
+    icon: '/favicon.ico', // path from /public
+  },
 }
 
 export default function RootLayout({

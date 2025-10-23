@@ -20,7 +20,8 @@ interface Product {
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // active search
+  const [searchInput, setSearchInput] = useState(''); // text field
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -39,7 +40,11 @@ export default function Products() {
       setLoading(true);
       setError(null);
 
-      const response = await apiClient.getProducts({ limit: 20 });
+      const response = await apiClient.getProducts({
+        limit: 20,
+        search: searchQuery || undefined, // optional: send query if present
+        category: selectedCategory && selectedCategory !== 'all' ? selectedCategory : undefined,
+      });
 
       if (response.success && response.data) {
         setProducts(response.data.products);
@@ -57,19 +62,19 @@ export default function Products() {
     }
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page when searching
+  const handleSearchClick = () => {
+    setSearchQuery(searchInput); // trigger useEffect -> loadProducts
+    setCurrentPage(1);
   };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   };
 
   const handlePriceRangeChange = (range: [number, number]) => {
     setPriceRange(range);
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -113,11 +118,15 @@ export default function Products() {
               <Input
                 type="text"
                 placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)} // only updates local input
                 className="pl-10"
               />
             </div>
+            <Button onClick={handleSearchClick} className="flex items-center justify-center">
+              <Search className="w-5 h-5 mr-2" />
+              Search
+            </Button>
             <Button
               onClick={() => setShowFilters(!showFilters)}
               variant="outline"
@@ -148,25 +157,6 @@ export default function Products() {
                     ))}
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Price: ₹{priceRange[1]}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10000"
-                    step="100"
-                    value={priceRange[1]}
-                    onChange={(e) => handlePriceRangeChange([0, parseInt(e.target.value)])}
-                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>₹0</span>
-                    <span>₹10,000</span>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -174,7 +164,7 @@ export default function Products() {
 
         <div className="mb-4 flex justify-between items-center">
           <p className="text-sm text-gray-600">
-          Showing {filteredProducts.length} products
+            Showing {filteredProducts.length} products
           </p>
           {totalPages > 1 && (
             <div className="flex items-center space-x-2">
