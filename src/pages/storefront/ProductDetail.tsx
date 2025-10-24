@@ -1,7 +1,7 @@
 'use client'
 
 import { use, useEffect, useState } from 'react';
-import router from 'next/router';
+import Link from 'next/link';
 import { useCartStore } from '../../store/cartStore';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
@@ -273,8 +273,8 @@ export default function ProductDetail({ id }: { id: string }) {
               </div>
 
               {/* Buy Now */}
+              <Link  onClick={handleBuyNow} href="/cart">
                 <button
-                  onClick={handleBuyNow}
                   disabled={currentStock === 0}
                   className={`w-full px-8 py-3 rounded-lg font-semibold flex items-center justify-center transition ${currentStock === 0
                       ? 'bg-gray-300 cursor-not-allowed'
@@ -284,6 +284,7 @@ export default function ProductDetail({ id }: { id: string }) {
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   {currentStock === 0 ? 'Out of Stock' : 'Buy Now'}
                 </button>
+              </Link>
             </div>
           </div>
         </div>
