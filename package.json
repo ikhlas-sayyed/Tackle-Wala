@@ -20,7 +20,6 @@
     "@tanstack/react-query": "^5.90.2",
     "bcryptjs": "^2.4.3",
     "crypto": "^1.0.1",
-    "formidable": "^3.5.4",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.344.0",
