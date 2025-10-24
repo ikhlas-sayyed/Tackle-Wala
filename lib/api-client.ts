@@ -443,6 +443,37 @@ class ApiClient {
     }>(`/admin/customers${queryString ? `?${queryString}` : ''}`)
   }
 
+  async uploadImage(file: File) {
+    // Step 1: Request a signed URL from your backend
+    const res = await this.request<{ url: string; key: string }>('/upload', {
+      method: 'POST',
+      body: JSON.stringify({ filename: file.name, fileType: file.type }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    console.log('Upload image response:', res);
+
+    const { url, key } = await res;
+    console.log('Signed URL:', url, 'Key:', key);
+
+    // Step 2: Upload file directly to S3 using the signed URL
+    const res1 = await fetch(url, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    });
+    console.log('S3 upload response:', res1);
+
+    if (!res1.ok) throw new Error("Upload failed");
+  console.log("File uploaded successfully");
+
+    // Step 3: Return the public URL
+    return { url: `https://${process.env.NEXT_PUBLIC_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${key}` };
+  }
+
+
   async getAdminCustomer(id: string) {
     return this.request<User>(`/admin/customers/${id}`)
   }

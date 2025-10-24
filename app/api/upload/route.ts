@@ -1,43 +1,35 @@
+import { S3Client, PutObjectCommand, GetObjectCommand, PutObjectCommandInput, PutObjectCommandOutput,  } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { NextRequest } from 'next/server';
-import path from 'path';
-import fs from 'fs/promises';
+import { unauthorizedResponse } from '@/lib/response';
+import { AuthService } from '@/lib/auth';
 
+const s3 = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
 
+export async function POST(req: NextRequest) {
+  //authentication and authorization checks can be added here
+  const user = AuthService.getUserFromRequest(req);
+  if (!user || user.role !== 'admin') return unauthorizedResponse();
 
-export async function POST(request: NextRequest) {
-  try {
+  const { filename, fileType } = await req.json();
 
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+  const key = `images/${Date.now()}-${filename}`;
 
-    if (!file) {
-      return Response.json({ success: false, error: 'No file uploaded' }, { status: 400 });
-    }
+  const command = new PutObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME!,
+    Key: key,
+    ContentType: fileType,
+  });
 
-    // Only allow image files
-    if (!file.type.startsWith('image/')) {
-      return Response.json({ success: false, error: 'Only image files are allowed' }, { status: 400 });
-    }
+  const signedUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
 
-    // Generate a unique filename
-    const ext = file.name.split('.').pop();
-    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-    await fs.mkdir(uploadDir, { recursive: true });
-
-    // Read file buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Save file
-    const filePath = path.join(uploadDir, filename);
-    await fs.writeFile(filePath, buffer);
-
-    // Return public URL (absolute for frontend)
-    const url = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/uploads/${filename}`;
-    return Response.json({ success: true, url });
-  } catch (error) {
-    console.error(error);
-    return Response.json({ success: false, error: 'Upload failed' }, { status: 500 });
-  }
+  return new Response(JSON.stringify({ url: signedUrl, key }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 }

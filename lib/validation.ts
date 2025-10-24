@@ -77,8 +77,8 @@ export const addressUpdateSchema = addressCreateSchema.partial()
 
 // Order schemas
 export const orderItemSchema = z.object({
-  productId: z.string().uuid().optional(),
-  variantId: z.string().uuid().optional(),
+  productId: z.string().optional(),
+  variantId: z.string().optional(),
   quantity: z.number().int().positive('Quantity must be positive'),
   price: z.number().positive('Price must be positive'),
 })

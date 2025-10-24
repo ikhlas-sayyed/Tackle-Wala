@@ -27,7 +27,7 @@ export async function GET(
       },
     })
 
-    if (!product) {
+    if (!product || product.deleted) {
       return notFoundResponse('Product not found')
     }
 
@@ -56,7 +56,7 @@ export async function PUT(
       where: { id: params.id },
     })
 
-    if (!existingProduct) {
+    if (!existingProduct || existingProduct.deleted) {
       return notFoundResponse('Product not found')
     }
 
@@ -142,13 +142,14 @@ export async function DELETE(
       where: { id: params.id },
     })
 
-    if (!existingProduct) {
+    if (!existingProduct || existingProduct.deleted) {
       return notFoundResponse('Product not found')
     }
 
     // Delete product (cascading deletes will handle images and variants)
-    await prisma.product.delete({
+    await prisma.product.update({
       where: { id: params.id },
+      data: { deleted: true },
     })
 
     return successResponse(null, 'Product deleted successfully')

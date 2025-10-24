@@ -62,9 +62,9 @@ export default function ProductForm({ productId, onClose }: ProductFormProps) {
       const uploadedImages = await Promise.all(Array.from(files).map(async (file) => {
         const formData = new FormData()
         formData.append('file', file)
-        const res = await fetch('/api/upload', { method: 'POST', body: formData })
-        const data = await res.json()
-        return { url: data.url }
+        //use apiClient to upload
+        const res = await apiClient.uploadImage(file)
+        return { url: res.url }
       }))
       setImages([...images, ...uploadedImages])
     } catch (error) {
@@ -217,6 +217,7 @@ const productData = {
                   <div key={idx} className="relative group">
                     <img
                       src={img.url}
+                      // crossOrigin="anonymous"
                       alt={`Product ${idx + 1}`}
                       className="w-32 h-32 object-cover rounded-lg border"
                     />

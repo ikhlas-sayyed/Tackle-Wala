@@ -38,6 +38,8 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    where.deleted = { equals: false };
+
     if (minPrice) where.price.gte = Number(minPrice)
     if (maxPrice) where.price.lte = Number(maxPrice)
 

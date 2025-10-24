@@ -152,7 +152,7 @@ export function Home() {
           <p className="text-gray-600">Discover our handpicked selection</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {featuredProducts.map((product) => (
             <Link
               key={product.id}
@@ -175,6 +175,7 @@ export function Home() {
             </Link>
           ))}
         </div>
+
 
         <div className="text-center mb-12">
           <Link

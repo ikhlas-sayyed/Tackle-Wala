@@ -23,7 +23,7 @@ export async function GET(
       },
     })
 
-    if (!product) {
+    if (!product || product.deleted) {
       return notFoundResponse('Product not found')
     }
 

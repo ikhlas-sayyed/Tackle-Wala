@@ -62,6 +62,8 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
 
+  deleted      Boolean  @default(false)
+
   images     ProductImage[]
   variants   ProductVariant[]
   orderItems OrderItem[]

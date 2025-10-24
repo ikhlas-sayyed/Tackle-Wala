@@ -33,8 +33,11 @@ export async function GET(request: NextRequest) {
             select: { orderItems: true },
           },
         },
+        where: { deleted: false },
       }),
-      prisma.product.count(),
+      prisma.product.count({
+        where: { deleted: false },
+      }),
     ])
 
     return successResponse({

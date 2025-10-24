@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react';
 import { apiClient, Banner } from '@/lib/api-client';
 import { Plus, CreditCard as Edit, Trash2, Eye, EyeOff } from 'lucide-react';
@@ -22,28 +24,22 @@ export default function Banners() {
     if (res.success && res.data) setBanners(res.data);
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  console.log('Submitting form, editingBanner =', editingBanner);
-  try {
-    if (editingBanner) {
-      console.log('Calling updateBanner...');
-      const res = await apiClient.updateBanner(editingBanner.id, formData);
-      console.log('Update response:', res);
-    } else {
-      console.log('Calling createBanner...');
-      const res = await apiClient.createBanner(formData);
-      console.log('Create response:', res);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingBanner) {
+        await apiClient.updateBanner(editingBanner.id, formData);
+      } else {
+        await apiClient.createBanner(formData);
+      }
+    } catch (err) {
+      console.error('Error in handleSubmit:', err);
     }
-  } catch (err) {
-    console.error('Error in handleSubmit:', err);
-  }
-  setShowForm(false);
-  setEditingBanner(null);
-  setFormData({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
-  await loadBanners();
-};
-
+    setShowForm(false);
+    setEditingBanner(null);
+    setFormData({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
+    await loadBanners();
+  };
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     await apiClient.updateBanner(id, { isActive: !currentStatus });
@@ -112,15 +108,34 @@ const handleSubmit = async (e: React.FormEvent) => {
               />
             </div>
 
+            {/* Image upload section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Image URL *</label>
-              <input
-                type="text"
-                required
-                value={formData.imageUrl}
-                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-2">Banner Image *</label>
+              <div className="flex items-center gap-4">
+                {formData.imageUrl && (
+                  <img
+                    src={formData.imageUrl}
+                    alt="Uploaded Banner"
+                    className="w-32 h-20 object-cover rounded border"
+                  />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  required={!formData.imageUrl}
+                  onChange={async (e) => {
+                    if (!e.target.files || e.target.files.length === 0) return;
+                    const file = e.target.files[0];
+                    try {
+                      const res = await apiClient.uploadImage(file);
+                      setFormData({ ...formData, imageUrl: res.url });
+                    } catch (err) {
+                      console.error('Image upload failed', err);
+                    }
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
             <div>
@@ -145,6 +160,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 onClick={() => {
                   setShowForm(false);
                   setEditingBanner(null);
+                  setFormData({ title: '', subtitle: '', imageUrl: '', linkUrl: '' });
                 }}
                 className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
@@ -159,15 +175,18 @@ const handleSubmit = async (e: React.FormEvent) => {
         {banners.map((banner) => (
           <div key={banner.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="aspect-video bg-gray-100">
-              <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover" />
+              <img
+                src={banner.imageUrl}
+                crossOrigin="anonymous"
+                alt={banner.title}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-semibold text-gray-900">{banner.title}</h3>
-                  {banner.subtitle && (
-                    <p className="text-sm text-gray-600 mt-1">{banner.subtitle}</p>
-                  )}
+                  {banner.subtitle && <p className="text-sm text-gray-600 mt-1">{banner.subtitle}</p>}
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
@@ -178,10 +197,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   >
                     {banner.isActive ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
-                  <button
-                    onClick={() => startEdit(banner)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
+                  <button onClick={() => startEdit(banner)} className="text-blue-600 hover:text-blue-800">
                     <Edit className="w-5 h-5" />
                   </button>
                   <button
@@ -192,9 +208,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   </button>
                 </div>
               </div>
-              {banner.linkUrl && (
-                <p className="text-xs text-gray-500 truncate">Link: {banner.linkUrl}</p>
-              )}
+              {banner.linkUrl && <p className="text-xs text-gray-500 truncate">Link: {banner.linkUrl}</p>}
             </div>
           </div>
         ))}
