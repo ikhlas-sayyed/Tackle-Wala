@@ -65,9 +65,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     try {
       const validatedData = productCreateSchema.parse(body)
+      const slug = validatedData.name
+  .split(' ')
+  .join('-')
+  .toLowerCase()
+  .slice(0, 20); // limit to 20 chars
       const product = await prisma.product.create({
         data: {
-          id: validatedData.name.split(' ').join('-').toLowerCase()+'-'+Date.now().toString().slice(-4),
+          //make in limit 30 characters
+          id: `${slug}-${Date.now().toString().slice(-4)}`,
           name: validatedData.name,
           description: validatedData.description,
           price: validatedData.price,
