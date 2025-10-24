@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { use, useEffect, useState } from 'react';
+import router from 'next/router';
 import { useCartStore } from '../../store/cartStore';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { apiClient } from '../../../lib/api-client';
@@ -37,6 +37,7 @@ export default function ProductDetail({ id }: { id: string }) {
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
+  const { items, removeItem } = useCartStore();
 
   useEffect(() => {
     // alert(id);
@@ -80,6 +81,38 @@ export default function ProductDetail({ id }: { id: string }) {
       console.error(err);
       toast.error('Failed to load product');
     }
+  };
+
+  const handleBuyNow = () => {
+    if (!productDetail) return;
+
+    const variant = selectedVariant
+      ? productDetail.variants.find((v) => v.id === selectedVariant)
+      : null;
+    const price = variant?.price || productDetail.price;
+    const stock = variant?.stock ?? productDetail.stock;
+    if (quantity > stock) {
+      toast.error('Quantity exceeds available stock');
+      return;
+    }
+
+    items.map(item => {
+      removeItem(item.productId, item.variantId);
+    });
+
+    addItem({
+      productId: productDetail.id,
+      variantId: variant?.id,
+      name: productDetail.name,
+      price,
+      quantity,
+      image: productDetail.images[0]?.url,
+      size: variant?.size || undefined,
+      color: variant?.color || undefined,
+    });
+
+    router.push('/cart');
+
   };
 
   const handleAddToCart = () => {
@@ -240,8 +273,8 @@ export default function ProductDetail({ id }: { id: string }) {
               </div>
 
               {/* Buy Now */}
-              <Link href="/cart" onClick={handleAddToCart}>
                 <button
+                  onClick={handleBuyNow}
                   disabled={currentStock === 0}
                   className={`w-full px-8 py-3 rounded-lg font-semibold flex items-center justify-center transition ${currentStock === 0
                       ? 'bg-gray-300 cursor-not-allowed'
@@ -251,7 +284,6 @@ export default function ProductDetail({ id }: { id: string }) {
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   {currentStock === 0 ? 'Out of Stock' : 'Buy Now'}
                 </button>
-              </Link>
             </div>
           </div>
         </div>
